@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#21162f">
+<title>Day 22 — The Anshika Time Capsule</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap');
+:root{--night:#21162f;--plum:#392343;--rose:#d9a7b8;--gold:#d8b779;--cream:#fff8f0;--ink:#49384d;--muted:#806d80}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--night);font-family:'DM Sans',sans-serif;color:var(--ink)}
+button,input,textarea{font:inherit}button{cursor:pointer}
+#app{min-height:100vh;padding:12px;background:radial-gradient(circle at 15% 8%,#63446f 0,transparent 32%),radial-gradient(circle at 90% 85%,#57354f 0,transparent 35%),linear-gradient(145deg,#1d1429,#34203d 55%,#21162f)}
+.shell{max-width:760px;min-height:calc(100vh - 24px);margin:auto;display:flex;flex-direction:column}
+header{display:flex;justify-content:space-between;align-items:center;color:#f8eaf0;padding:7px 3px 13px;font-size:11px;letter-spacing:2px;text-transform:uppercase}
+.brand{font-family:'Cormorant Garamond',serif;font-size:21px;letter-spacing:.5px;text-transform:none}
+.progress{height:4px;background:#ffffff26;border-radius:10px;overflow:hidden;margin-bottom:14px}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--gold));transition:width .4s}
+.scene{display:none;flex:1;background:linear-gradient(155deg,#fffaf5,#f6eaf0);border:1px solid #f0d9df;border-radius:24px;padding:clamp(22px,5vw,38px);box-shadow:0 22px 65px #100a1c70;animation:fade .45s ease;overflow:hidden}
+.scene.active{display:flex;flex-direction:column}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.center{text-align:center;align-items:center}.eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#a16c83}
+h1,h2,h3{font-family:'Cormorant Garamond',serif;color:var(--plum);font-weight:600;line-height:1.04;margin:12px 0}
+h1{font-size:clamp(45px,10vw,76px)}h2{font-size:clamp(36px,8vw,52px)}h3{font-size:27px}
+.script{font-family:'Great Vibes',cursive;font-size:clamp(34px,8vw,49px);color:#a65f7b}
+p{font-size:15px;line-height:1.8;color:#68576a}.lead{font-size:17px}
+.orn{font-size:25px;letter-spacing:10px;color:#bb8799;margin:10px}
+.btn{border:0;border-radius:30px;padding:14px 21px;background:linear-gradient(110deg,#a66d87,#70466f);color:#fff;font-weight:700;box-shadow:0 8px 20px #71486f30}
+.btn.alt{background:#f1e0e7;color:#754b64;border:1px solid #e4c8d3;box-shadow:none}.btn.gold{background:linear-gradient(110deg,#c8a264,#987344)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:auto;padding-top:24px}
+.card{background:#fffdf9;border:1px solid #ead6dd;border-radius:17px;padding:18px;margin:14px 0;box-shadow:0 7px 18px #69445a0b}
+.small{font-size:12px;color:#907b8d}.bigicon{font-size:62px;margin:10px 0}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.choice{background:#fff;border:1px solid #e6cdd7;border-radius:14px;padding:14px;color:#59445c;text-align:left;min-height:54px}.choice.selected{background:#f7e9ef;border-color:#b77d95}
+.feedback{min-height:24px;text-align:center;color:#98627a;font-size:13px;font-weight:700}
+input,textarea{width:100%;border:1px solid #dfc5d0;border-radius:13px;padding:13px;background:#fffdfb;color:#4d3a50;outline:none}
+textarea{min-height:120px;resize:vertical;line-height:1.6}
+.timeline{display:grid;gap:10px;margin:15px 0}.timeitem{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #ead6dd;border-radius:14px;padding:13px}.timeitem b{color:#8b5872}
+.envelopes{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:16px 0}
+.env{background:#fff;border:1px solid #e7cbd6;border-radius:15px;padding:17px 10px;text-align:center;color:#704a65;min-height:120px}
+.env span{display:block;font-size:34px;margin-bottom:7px}.env small{display:block;color:#927d8e;margin-top:5px}
+.letter{background:#fffdf8;border:1px solid #ead6c9;border-radius:16px;padding:20px;line-height:1.85;color:#604e5c;white-space:pre-line;font-size:15px}
+.starfield{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0}
+.star{border:0;background:transparent;color:#bd8c48;font-size:32px;filter:drop-shadow(0 2px 5px #d5b47c66);padding:8px}
+.star.done{color:#e1b95f;transform:scale(1.15)}
+.movie{background:linear-gradient(145deg,#291b39,#604166);color:#fff;border-radius:18px;padding:24px;text-align:center;margin:16px 0}
+.movie h3{color:#fff}.movie p{color:#f1dfe9}
+.bottle{font-size:75px;display:inline-block;transition:transform .5s;cursor:pointer}.bottle.open{transform:rotate(28deg) translateY(-8px)}
+.mirror{border:7px solid #c6a46b;border-radius:48% 48% 42% 42%;padding:24px;background:linear-gradient(145deg,#eee0ec,#fff9f2);box-shadow:inset 0 0 25px #fff,0 10px 25px #68405b22;margin:18px auto;max-width:330px}
+.hidden{display:none!important}
+footer{text-align:center;color:#f3dce7;font-size:10px;letter-spacing:2px;padding:13px}
+.petal{position:fixed;top:-30px;pointer-events:none;z-index:5;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(500deg);opacity:0}}
+@media(max-width:440px){#app{padding:8px}.scene{padding:21px 17px}.choices{grid-template-columns:1fr}.starfield{gap:3px}.star{font-size:26px}.env{padding:13px 7px}}
+</style>
+</head>
+<body>
+<div id="app"><div class="shell">
+<header><span class="brand">✦ The Anshika Time Capsule</span><span id="chapter">A little journey</span></header>
+<div class="progress"><span id="progress"></span></div>
+
+<section class="scene active center" id="s0">
+ <div class="eyebrow">Day 22 · November Is Hers</div><div class="bigicon">⏳</div>
+ <h1>The Anshika<br>Time Capsule</h1><div class="script">a little something beyond time</div>
+ <div class="orn">✧ ✦ ✧</div>
+ <p class="lead">I wanted to make something you could open slowly, smile at, and come back to whenever you feel like it.</p>
+ <p>Not a list of perfect words. Just little reminders about the things I notice in you, the things you love, the dreams you're carrying, and the person you are even on completely ordinary days.</p>
+ <div class="actions"><button class="btn" onclick="go(1)">UNLOCK THE CAPSULE ✨</button></div>
+</section>
+
+<section class="scene" id="s1">
+ <div class="eyebrow">Chapter 01 · Choose your time</div><h2>The Time Machine</h2>
+ <p>Three little doors: the things that have brought you here, the person you are right now, and all the things still waiting for you. Pick any one — you can come back for the others.</p>
+ <div class="choices">
+  <button class="choice" onclick="timeChoice('past',this)">🕰️ <b>The Past</b><br><small>Little things that shaped you</small></button>
+  <button class="choice" onclick="timeChoice('present',this)">🌷 <b>The Present</b><br><small>The person you are today</small></button>
+  <button class="choice" onclick="timeChoice('future',this)">🌌 <b>The Future</b><br><small>The life you're building</small></button>
+ </div>
+ <div class="card" id="timeMessage">Choose a door to reveal its message.</div>
+ <div class="actions"><button class="btn" onclick="go(2)">CONTINUE THROUGH TIME →</button></div>
+</section>
+
+<section class="scene" id="s2">
+ <div class="eyebrow">Chapter 02 · A little archive</div><h2>The Little Things Archive</h2>
+ <p>A collection of things that make you unmistakably you. Tap each drawer to open it.</p>
+ <div class="envelopes">
+  <button class="env" onclick="archive(0,this)"><span>🌻</span><b>Your curiosity</b><small>Open drawer</small></button>
+  <button class="env" onclick="archive(1,this)"><span>🎧</span><b>Your interests</b><small>Open drawer</small></button>
+  <button class="env" onclick="archive(2,this)"><span>✨</span><b>Your ambitions</b><small>Open drawer</small></button>
+  <button class="env" onclick="archive(3,this)"><span>🎀</span><b>Your little quirks</b><small>Open drawer</small></button>
+ </div>
+ <div class="card" id="archiveMessage">Four drawers are waiting. Open them all.</div>
+ <div class="actions"><button class="btn" onclick="go(3)">NEXT CHAPTER →</button></div>
+</section>
+
+<section class="scene" id="s3">
+ <div class="eyebrow">Chapter 03 · Five little letters</div><h2>Open When...</h2>
+ <p>These envelopes are here for different kinds of days. Open whichever one feels right.</p>
+ <div class="envelopes">
+  <button class="env" onclick="openLetter(0)"><span>💌</span><b>When you're happy</b><small>A little celebration</small></button>
+  <button class="env" onclick="openLetter(1)"><span>🌧️</span><b>When things feel hard</b><small>A gentle reminder</small></button>
+  <button class="env" onclick="openLetter(2)"><span>🦋</span><b>When you doubt yourself</b><small>Read this slowly</small></button>
+  <button class="env" onclick="openLetter(3)"><span>😂</span><b>When you need a laugh</b><small>A tiny dose of chaos</small></button>
+  <button class="env" style="grid-column:1/-1" onclick="openLetter(4)"><span>🌙</span><b>When you need motivation</b><small>Your next little push</small></button>
+ </div>
+ <div class="letter hidden" id="openLetterText"></div>
+ <div class="actions"><button class="btn" onclick="go(4)">CONTINUE →</button></div>
+</section>
+
+<section class="scene" id="s4">
+ <div class="eyebrow">Chapter 04 · Find your stars</div><h2>Constellation of Anshika</h2>
+ <p>Five stars. Five qualities worth celebrating. Tap every star to connect your constellation.</p>
+ <div class="starfield" id="stars">
+  <button class="star" onclick="star(0)">☆</button><button class="star" onclick="star(1)">☆</button><button class="star" onclick="star(2)">☆</button><button class="star" onclick="star(3)">☆</button><button class="star" onclick="star(4)">☆</button>
+ </div>
+ <div class="card" id="starMessage">Your constellation is waiting to light up.</div>
+ <div class="actions"><button class="btn" onclick="go(5)">FOLLOW THE STARS →</button></div>
+</section>
+
+<section class="scene" id="s5">
+ <div class="eyebrow">Chapter 05 · Incoming transmission</div><h2>A Radio Message from the Future</h2>
+ <div class="bigicon">📻</div>
+ <p>A little radio crackles to life. A message is arriving from a future version of you.</p>
+ <div class="movie"><div class="eyebrow" style="color:#eac5d5">TRANSMISSION · FUTURE ANSHIKA</div><h3>Hey, you.</h3><p>I'm writing from a day you haven't reached yet. I hope you kept your curiosity. I hope you gave your dreams a real chance. I hope you visited places that once existed only in your imagination. And I hope you learned to be proud of the person you were becoming — even before everything was figured out.</p><p>Keep going. There is so much life left to discover.</p></div>
+ <div class="actions"><button class="btn" onclick="go(6)">RECEIVE THE NEXT MESSAGE →</button></div>
+</section>
+
+<section class="scene" id="s6">
+ <div class="eyebrow">Chapter 06 · A little self-discovery</div><h2>The Future Self Quiz</h2>
+ <p>Choose what feels most exciting to you. There are no wrong answers — this is your own little postcard from today.</p>
+ <div class="card"><b>1. Which adventure would you choose?</b><div class="choices"><button class="choice" onclick="pick(0,'Explore a new country ✈️',this)">✈️ Explore a new country</button><button class="choice" onclick="pick(0,'Build a dream career 💼',this)">💼 Build a dream career</button></div></div>
+ <div class="card"><b>2. What would you like more of?</b><div class="choices"><button class="choice" onclick="pick(1,'Confidence 🌷',this)">🌷 Confidence</button><button class="choice" onclick="pick(1,'Freedom 🦋',this)">🦋 Freedom</button></div></div>
+ <div class="card"><b>3. What should future-you never lose?</b><div class="choices"><button class="choice" onclick="pick(2,'Curiosity ✨',this)">✨ Curiosity</button><button class="choice" onclick="pick(2,'Her sense of humour 😂',this)">😂 Her sense of humour</button></div></div>
+ <div class="feedback" id="quizFeedback"></div>
+ <div class="actions"><button class="btn" onclick="makePostcard()">MAKE MY POSTCARD →</button></div>
+ <div class="letter hidden" id="postcard"></div>
+ <div class="actions hidden" id="postcardContinue"><button class="btn" onclick="go(7)">CONTINUE THE JOURNEY →</button></div>
+</section>
+
+<section class="scene" id="s7">
+ <div class="eyebrow">Chapter 07 · Coming attractions</div><h2>The Unwritten Movie</h2>
+ <p>This isn't a prediction or a checklist. It's just me hoping you get the chance to experience the things you want, in a life that feels genuinely yours.</p>
+ <div class="movie">
+  <div style="font-size:12px;letter-spacing:4px;color:#e5c7d8">COMING SOON</div>
+  <h1 style="color:#fff;font-size:clamp(40px,9vw,65px)">ANSHIKA</h1>
+  <div class="script" style="color:#e9b9ca">The life you're creating</div>
+  <p>Starring: a curious mind, a brave heart, big ambitions and a girl who keeps discovering what she's capable of.</p>
+  <p>Featuring: new places, unexpected opportunities, your favourite songs playing at the right time, BTS nights, Jungkook appreciation, laughter, independence, ambitious plans and countless firsts.</p>
+  <p><b>Genre:</b> A life written by her, on her own terms.</p>
+ </div>
+ <div class="actions"><button class="btn" onclick="go(8)">NEXT SCENE →</button></div>
+</section>
+
+<section class="scene center" id="s8">
+ <div class="eyebrow">Chapter 08 · Found at sea</div><h2>A Message in a Bottle</h2>
+ <p>A little bottle has travelled a long way to reach you. Tap it to open the note inside.</p>
+ <button class="bottle" id="bottle" onclick="openBottle()">🍾</button>
+ <div class="letter hidden" id="bottleNote">Anshika,
+
+If life ever feels like it is moving too slowly, please don't mistake that for standing still. You can be learning, changing and figuring things out even when nobody can see it.
+
+Keep the things that make you excited. Keep your music, your interests, your questions and your plans. And please keep making room for the big dreams too — the independent life, the places you want to see and the person you want to become.
+
+You don't need to have the whole map. Just don't stop giving yourself new places to go. 🌊💗</div>
+ <div class="actions"><button class="btn" onclick="go(9)">FIND THE FINAL MIRROR →</button></div>
+</section>
+
+<section class="scene center" id="s9">
+ <div class="eyebrow">Chapter 09 · A reminder</div><h2>The Mirror of Truth</h2>
+ <p>Look into the mirror. It has a few things it wants you to remember.</p>
+ <div class="mirror"><div class="bigicon">🪞</div><h3 id="mirrorText">You are allowed to grow at your own pace.</h3></div>
+ <button class="btn alt" onclick="nextMirror()">REVEAL ANOTHER REMINDER ✨</button>
+ <div class="actions"><button class="btn" onclick="go(10)">OPEN THE LAST ENVELOPE →</button></div>
+</section>
+
+<section class="scene" id="s10">
+ <div class="eyebrow">Chapter 10 · The final envelope</div><h2>A Letter for the Road Ahead</h2>
+ <div class="bigicon" style="text-align:center">💌</div>
+ <div class="letter">Dear Anshika,
+
+I hope you never feel that you have to become less curious, less expressive or less excited about the things you love just to fit into someone else's idea of who you should be.
+
+I hope you keep BTS, Jungkook, your music, your interests and all your little sources of happiness close. I hope you keep talking about the things you love without wondering whether somebody will find them silly.
+
+I hope you go after your ambitions. I hope you get to become independent, explore places you've wanted to visit, try things that scare you a little, and build a future that feels like it belongs to you. And I hope you remember that changing your plans is allowed too.
+
+Also, please don't be too hard on yourself on the days when you don't get everything done. Your worth was never supposed to depend on a perfect day, a result, or how productive you were. You deserve kindness on the ordinary days as much as on the big ones.
+
+And because I know I can get very dramatic about you: I really do notice the little things. Your expressions, your sarcasm, your yapping, your random excitement, and the way you can make a simple moment feel memorable. I hope you never lose those parts of yourself.
+
+I can't tell you exactly what the future will look like. But I genuinely hope it gives you room to grow, reasons to laugh, people who encourage you, and chances to discover just how much you're capable of.
+
+Keep growing, keep glowing, and keep being you.
+
+With lots of affection,
+Someone who wanted your November to feel a little more special 💗</div>
+ <div class="card">
+  <b>Now, leave a note for your future self.</b>
+  <p class="small">Write anything you'd like to remember. Your note stays on this page until you save or download it.</p>
+  <textarea id="futureNote" placeholder="Dear future me..."></textarea>
+  <div class="actions" style="padding-top:12px"><button class="btn alt" onclick="downloadNote()">SAVE MY POSTCARD ↓</button></div>
+ </div>
+ <div class="actions"><button class="btn gold" onclick="sealCapsule()">SEAL THE TIME CAPSULE ✨</button></div>
+</section>
+
+<section class="scene center" id="s11">
+ <div class="eyebrow">Day 22 · Capsule sealed</div><div class="bigicon">🌌</div>
+ <h1>Until Another Time</h1>
+ <div class="script">Anshika, keep becoming.</div>
+ <p class="lead">The capsule is sealed. Your story, obviously, is nowhere near finished.</p>
+ <div class="letter">Anshika, I hope you keep choosing the things that make you feel like yourself.
+
+Keep the music you love. Keep the dreams that excite you. Keep asking questions, making plans, laughing at random things and being a little dramatic when the moment calls for it.
+
+And whenever you look back at this, I hope you can see how much there still is ahead of you — not pressure to have it all figured out, just so many possibilities waiting to be explored.
+
+I'm rooting for the life you want to build.
+
+KEEP GROWING. KEEP GLOWING. KEEP BEING YOU. 💗</div>
+ <div class="actions"><button class="btn" onclick="go(0)">REVISIT THE CAPSULE ↺</button></div>
+</section>
+
+<footer>MADE WITH CARE · NOVEMBER IS HERS 💗</footer>
+</div></div>
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+let current=0,archiveCount=0,starCount=0,quizAnswers=[null,null,null],mirrorIndex=0;
+const progress=document.getElementById('progress');
+function go(n){current=n;scenes.forEach((s,i)=>s.classList.toggle('active',i===n));document.getElementById('chapter').textContent=n===0?'A little journey':`Chapter ${n} of 10`;progress.style.width=(n/11*100)+'%';window.scrollTo({top:0,behavior:'smooth'});if(n===11)petals();}
+function timeChoice(kind,el){document.querySelectorAll('#s1 .choice').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');const m={past:'And somewhere in all those ordinary moments are the little things I never want to take for granted — the bus memories, the laughter, the hand-holding, the silly little conversations and the moments that probably seemed ordinary at the time but became special when I looked back. I don't need to turn them into numbers to know they matter. 💗',present:'Right now, you are still the girl with her own opinions, curiosity, sarcasm, random yapping, big dreams and that very particular excitement when something you love comes up. I hope you know you do not have to become some future version of yourself to deserve appreciation today. 🌷',future:'I hope you get the freedom to build a life that feels like yours — to chase your ambitions, become independent, visit places you want to see, explore new interests and make choices without shrinking your dreams for anyone. I hope you get to be proud of the life you create. 🦋'};document.getElementById('timeMessage').textContent=m[kind];}
+const archiveTexts=[
+'Your curiosity makes the world bigger. Keep asking questions, looking closer and letting yourself discover new things.',
+'Your interests deserve space — including the music and stories you can get completely lost in. I know BTS means a lot to you, and Jungkook has his own special place in that universe. Never feel like you have to explain away the things that make you happy. 💜',
+'Your ambitions matter. You are allowed to want a big, independent and exciting life — and to work towards it at your own pace.',
+'Your expressions, yapping, sarcasm, little reactions and random excitement are so unmistakably you. Even your dramatic reactions deserve their own little archive. Please never edit those parts of yourself out. 🎀'
+];
+function archive(i,el){el.classList.add('selected');document.getElementById('archiveMessage').textContent=archiveTexts[i];if(!el.dataset.open){el.dataset.open='1';archiveCount++;}}
+const letters=[
+'When something wonderful happens, tell someone, celebrate it properly and let yourself be excited without feeling silly. I hope you get a thousand more moments that make you want to say, “OHH MY GAWDDD!” and grin for the rest of the day. You deserve that kind of happiness. 🌷',
+'You do not have to solve everything today. Take things one step at a time, give yourself room to breathe and remember that a difficult day does not define your whole story. Be kind to yourself. 🤍',
+'You are allowed to be a work in progress. You do not need to compare your timeline with anyone else’s. Your ideas, efforts and dreams deserve a chance. Believe in your ability to learn and grow. 🦋',
+'Official reminder: please continue being wonderfully dramatic. Keep the yapping, the sarcasm, the random excitement, the BTS enthusiasm and those reactions that somehow say a whole paragraph without saying anything. I am not accepting a quieter, less-you version. 😂💗',
+'Start small if you need to. Ask questions, practise, try again and celebrate progress. You do not need perfect confidence before beginning. Sometimes confidence arrives after you take the first step. ✨'
+];
+function openLetter(i){const el=document.getElementById('openLetterText');el.textContent=letters[i];el.classList.remove('hidden');}
+const starTexts=['Your curiosity — the way you keep asking, noticing and wanting to understand more.','Your enthusiasm — especially when you talk about the things you genuinely love. Keep that BTS-loving, music-loving spark. 💜','Your ambitions — they deserve room, effort and encouragement. Do not make your dreams smaller just to make them easier to explain.','Your little quirks — the expressions, sarcasm, yapping and dramatic reactions that make you unmistakably Anshika.','Your individuality — you get to write your own story, choose your own pace and decide what a good life looks like for you.'];
+function star(i){const b=document.querySelectorAll('.star')[i];if(!b.classList.contains('done')){b.classList.add('done');b.textContent='★';starCount++;}document.getElementById('starMessage').textContent=starTexts[i];}
+function pick(q,a,el){quizAnswers[q]=a;el.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');document.getElementById('quizFeedback').textContent='Saved for your postcard 💗';}
+function makePostcard(){if(quizAnswers.some(x=>!x)){document.getElementById('quizFeedback').textContent='Choose one answer in each little question first.';return;}const p=`A postcard from today, addressed to future Anshika:\n\nI hope you get to ${quizAnswers[0].replace(/ [^\s]+$/,'').toLowerCase()}, find more ${quizAnswers[1].replace(/ [^\s]+$/,'').toLowerCase()}, and never lose ${quizAnswers[2].replace(/ [^\s]+$/,'').toLowerCase()}.\n\nWhatever changes, I hope you keep making choices that feel like your own. Keep exploring. 💗`;const el=document.getElementById('postcard');el.textContent=p;el.classList.remove('hidden');document.getElementById('postcardContinue').classList.remove('hidden');}
+function openBottle(){document.getElementById('bottle').classList.add('open');document.getElementById('bottleNote').classList.remove('hidden');}
+const mirrors=['You are allowed to grow at your own pace.','Your worth is not measured by one difficult day.','Your interests deserve to be appreciated — yes, even the ones you can talk about for ages.','You can change your mind and still be moving forward.','You do not need to have everything figured out today.','Your dreams deserve space, and so do your ordinary happy moments.'];
+function nextMirror(){mirrorIndex=(mirrorIndex+1)%mirrors.length;document.getElementById('mirrorText').textContent=mirrors[mirrorIndex];}
+function downloadNote(){const note=document.getElementById('futureNote').value.trim();if(!note){alert('Write a little note to your future self first 💗');return;}const blob=new Blob([`A NOTE TO MY FUTURE SELF\n\n${note}\n\nSaved from The Anshika Time Capsule · Day 22`],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Anshika_future_self_postcard.txt';a.click();URL.revokeObjectURL(a.href);}
+function sealCapsule(){go(11);}
+function petals(){for(let i=0;i<18;i++){const e=document.createElement('div');e.className='petal';e.textContent=['🌸','✦','💗','🍃'][i%4];e.style.left=Math.random()*100+'vw';e.style.animationDuration=(5+Math.random()*5)+'s';e.style.fontSize=(13+Math.random()*13)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),11000);}}
+</script>
+</body>
+</html>
